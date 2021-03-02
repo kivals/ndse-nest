@@ -1,0 +1,46 @@
+version: '3.2'
+services:
+  ndse-book-app-ts:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ndse-book-nest
+    container_name: ndse-book-nest-ctn
+    environment:
+      - MONGODB_URL=mongodb://mongodb:27017/ndse-book-app-ts
+    ports:
+    - 3000:3000
+    volumes:
+    - .:/usr/src/node-app
+    depends_on:
+      - mongodb
+    networks:
+      - node-network
+    command: npm run start:dev
+
+  mongodb:
+    image: mongo:4.2.1-bionic
+    container_name: mongo-ctn
+    volumes:
+      - ./dbdata:/data/db
+    networks:
+      - node-network
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    depends_on:
+      - mongodb
+    networks:
+      - node-network
+
+volumes:
+  dbdata:
+
+networks:
+  node-network:
+    driver: bridge
