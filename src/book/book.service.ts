@@ -1,19 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { Book } from './entity/book.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Book } from './entity/book.entity';
+import { CreateBookDto } from './dto/create-book.dto';
+import { UpdateBookDto } from './dto/update-book.dto';
 
 @Injectable()
 export class BookService {
-  private readonly books: Book[] = [];
+  constructor(@InjectModel(Book.name) private readonly bookModel: Model<Book>) {}
 
-  getAll(): Book[] {
-    return this.books;
+  findAll() {
+    return this.bookModel.find().exec();
   }
 
-  getBookById(id: string): Book | undefined {
-    return this.books.find((b) => b.id === id);
+  async findById(id: string) {
+    const book = await this.bookModel.findById(id).exec();
+    if (!book) {
+      throw new NotFoundException(`Book #${id} not found`);
+    }
+    return book;
   }
 
-  create(book: Book): void {
-    this.books.push(book);
+  create(createBookDto: CreateBookDto) {
+    const book = new this.bookModel(createBookDto);
+    return book.save();
+  }
+
+  async update(id: string, updateBookDto: UpdateBookDto) {
+    const existBook = await this.bookModel.findByIdAndUpdate(id, { $set: updateBookDto }, { new: true }).exec();
+    if (!existBook) {
+      throw new NotFoundException(`Book #${id} not found`);
+    }
+    return existBook;
+  }
+
+  async remove(id: string) {
+    const existBook = await this.bookModel.findById(id);
+    if (!existBook) {
+      throw new NotFoundException(`Book #${id} not found`);
+    }
+    return existBook.remove();
   }
 }
