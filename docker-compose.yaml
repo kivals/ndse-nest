@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile
     image: ndse-book-nest
     container_name: ndse-book-nest-ctn
-    environment:
-      - MONGODB_URL=mongodb://mongodb:27017/ndse-book-app-ts
+    env_file:
+      - .env
     ports:
     - 3000:3000
     volumes:
