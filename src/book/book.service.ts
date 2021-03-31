@@ -21,13 +21,14 @@ export class BookService {
     return book;
   }
 
-  create(createBookDto: CreateBookDto) {
-    const book = new this.bookModel(createBookDto);
-    return book.save();
+  async create(createBookDto: CreateBookDto) {
+    return await this.bookModel.create(createBookDto);
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto) {
-    const existBook = await this.bookModel.findByIdAndUpdate(id, { $set: updateBookDto }, { new: true }).exec();
+  async update(id: string, updateBookDto: CreateBookDto) {
+    const existBook = await this.bookModel
+      .findByIdAndUpdate(id, { $set: updateBookDto }, { new: true })
+      .exec();
     if (!existBook) {
       throw new NotFoundException(`Book #${id} not found`);
     }
