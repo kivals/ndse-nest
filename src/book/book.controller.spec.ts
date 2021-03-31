@@ -34,7 +34,7 @@ describe('Book Controller', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('getAllCats', () => {
+  describe('getAllBooks', () => {
     it('should get the list of books', () => {
       const retBooks = controller.getAll();
       expect(typeof retBooks).toBe('object');
