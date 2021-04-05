@@ -5,15 +5,8 @@ import { BookController } from './book.controller';
 import { Book, BookSchema } from './entity/book.entity';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      {
-        name: Book.name,
-        schema: BookSchema,
-      },
-    ]),
-  ],
   providers: [BookService],
   controllers: [BookController],
+  exports: [BookService],
 })
 export class BookModule {}
