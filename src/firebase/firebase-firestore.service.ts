@@ -12,7 +12,11 @@ export class FirebaseFirestoreService {
     return this.app.firestore();
   }
 
-  doc(documentPath) {
+  doc(documentPath: string) {
     return this.firestore.doc(documentPath);
+  }
+
+  collection(collectionPath: string) {
+    return this.firestore.collection(collectionPath);
   }
 }
