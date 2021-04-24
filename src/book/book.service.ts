@@ -6,8 +6,8 @@ import {CreateBookDto} from "./dto/create-book.dto";
 export class BookService {
   constructor(private firestore: FirebaseFirestoreService) {}
   async findAll() {
-    const citiesRef = this.firestore.collection('books');
-    const snapshot = await citiesRef.get();
+    const booksRef = this.firestore.collection('books');
+    const snapshot = await booksRef.get();
     const books = [];
     snapshot.forEach((doc) => {
       const book = Object.assign(doc.data(), { id: doc.id })
