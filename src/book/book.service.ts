@@ -1,40 +1,39 @@
-import { Injectable } from '@nestjs/common';
-// import { CreateBookDto } from './dto/create-book.dto';
-// import { UpdateBookDto } from './dto/update-book.dto';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import {FirebaseFirestoreService} from '../firebase/firebase-firestore.service';
+import {CreateBookDto} from "./dto/create-book.dto";
 
 @Injectable()
 export class BookService {
-  findAll() {
-    return [];
+  constructor(private firestore: FirebaseFirestoreService) {}
+  async findAll() {
+    const citiesRef = this.firestore.collection('books');
+    const snapshot = await citiesRef.get();
+    const books = [];
+    snapshot.forEach((doc) => {
+      const book = Object.assign(doc.data(), { id: doc.id })
+      books.push(book);
+    });
+    return books;
   }
 
-  // async findById(id: string) {
-  //   const book = await this.bookModel.findById(id).exec();
-  //   if (!book) {
-  //     throw new NotFoundException(`Book #${id} not found`);
-  //   }
-  //   return book;
-  // }
-  //
-  // async create(createBookDto: CreateBookDto) {
-  //   return await this.bookModel.create(createBookDto);
-  // }
-  //
-  // async update(id: string, updateBookDto: CreateBookDto) {
-  //   const existBook = await this.bookModel
-  //     .findByIdAndUpdate(id, { $set: updateBookDto }, { new: true })
-  //     .exec();
-  //   if (!existBook) {
-  //     throw new NotFoundException(`Book #${id} not found`);
-  //   }
-  //   return existBook;
-  // }
-  //
-  // async remove(id: string) {
-  //   const existBook = await this.bookModel.findById(id);
-  //   if (!existBook) {
-  //     throw new NotFoundException(`Book #${id} not found`);
-  //   }
-  //   return existBook.remove();
-  // }
+  async findById(id: string) {
+    const snapshot = await this.firestore.collection('books').doc(id).get();
+
+    if (!snapshot.exists) {
+      throw new NotFoundException();
+    } else {
+      return Object.assign(snapshot.data(), { id: snapshot.id });
+    }
+  }
+
+  async create(createBookDto: CreateBookDto) {
+    const bookRef = this.firestore.collection('books').doc();
+    await bookRef.set(createBookDto);
+
+    return bookRef.get().then(book => book.data() && Object.assign(book.data(), { id: book.id }));
+  }
+
+  async remove(id: string) {
+    return this.firestore.collection('books').doc(id).delete();
+  }
 }
