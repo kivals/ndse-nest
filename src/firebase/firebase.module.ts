@@ -4,13 +4,10 @@ import admin from 'firebase-admin';
 
 @Module({})
 export class FirebaseModule {
-  static forRoot(options: any): DynamicModule {
-    console.log(options);
+  static forRoot(): DynamicModule {
     const app =
       admin.apps.length === 0
-        ? admin.initializeApp({
-            credential: admin.credential.cert(options),
-          })
+        ? admin.initializeApp()
         : admin.apps[0];
 
     const provider = this.createProvider(app);
